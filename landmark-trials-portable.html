@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landmark Trials — Surgical Critical Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAEEEB;
+    --surface:#FBFCFB;
+    --ink:#15211C;
+    --muted:#5B6A63;
+    --faint:#8A968F;
+    --line:#D2DAD4;
+    --line-strong:#BEC8C1;
+    --accent:#12695A;
+    --accent-deep:#0C4A3F;
+    --signal:#A66A16;
+    --danger:#9E3324;
+    --shadow:0 1px 2px rgba(21,33,28,.06), 0 8px 24px -12px rgba(21,33,28,.18);
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #F2F5F2 0%, var(--bg) 55%) fixed,
+      var(--bg);
+    color:var(--ink);
+    font-family:"Inter",-apple-system,system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(18px,4vw,44px) clamp(14px,4vw,44px) 60px;
+  }
+  .wrap{max-width:1000px;margin:0 auto}
+
+  /* ---- masthead ---- */
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;font-weight:500;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::after{content:"";height:1px;flex:1;background:var(--line-strong)}
+  h1.title{
+    font-family:"Newsreader",serif;
+    font-weight:500;
+    font-size:clamp(30px,5.5vw,50px);
+    line-height:1.02;letter-spacing:-.01em;margin:0;
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .lede{
+    color:var(--muted);max-width:56ch;margin:14px 0 0;font-size:15px;
+  }
+  .meter{
+    display:flex;gap:26px;margin:22px 0 0;padding:14px 0 0;
+    border-top:1px solid var(--line);font-family:"IBM Plex Mono",monospace;
+  }
+  .meter b{display:block;font-size:22px;font-weight:500;color:var(--ink);line-height:1}
+  .meter span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---- controls ---- */
+  .controls{
+    position:sticky;top:0;z-index:30;
+    background:linear-gradient(var(--bg) 72%, rgba(234,238,235,0));
+    padding:20px 0 16px;margin:26px 0 8px;
+  }
+  .addbar{
+    display:flex;gap:8px;background:var(--surface);
+    border:1px solid var(--line-strong);border-radius:var(--radius);
+    padding:6px;box-shadow:var(--shadow);
+  }
+  .addbar input{
+    flex:1;border:0;background:transparent;color:var(--ink);
+    font:inherit;font-size:15px;padding:10px 12px;outline:none;
+  }
+  .addbar input::placeholder{color:var(--faint)}
+  button{font:inherit;cursor:pointer}
+  .btn-add{
+    border:0;background:var(--accent);color:#fff;font-weight:600;font-size:14px;
+    padding:10px 20px;border-radius:7px;letter-spacing:.01em;
+    transition:background .15s ease;
+  }
+  .btn-add:hover{background:var(--accent-deep)}
+  .btn-add:disabled{opacity:.55;cursor:progress}
+  .subrow{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    margin-top:10px;flex-wrap:wrap;
+  }
+  .searchbox{position:relative;flex:1;min-width:200px}
+  .searchbox input{
+    width:100%;border:1px solid var(--line);background:var(--surface);
+    border-radius:7px;font:inherit;font-size:13px;padding:8px 12px 8px 30px;
+    color:var(--ink);outline:none;
+  }
+  .searchbox input:focus{border-color:var(--accent)}
+  .searchbox svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--faint)}
+  .status{font-size:12.5px;color:var(--muted);min-height:16px}
+  .status.err{color:var(--danger)}
+  .status .dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--accent);margin-right:6px;vertical-align:middle;
+    animation:pulse 1s infinite ease-in-out}
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+  /* ---- category section ---- */
+  .cat{margin:34px 0 0}
+  .cat-head{
+    display:flex;align-items:baseline;gap:12px;margin:0 0 14px;
+  }
+  .cat-tab{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:#fff;padding:5px 11px;border-radius:5px;white-space:nowrap;
+  }
+  .cat-name{font-family:"Newsreader",serif;font-size:20px;font-weight:500;color:var(--ink)}
+  .cat-count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .cat-rule{height:1px;flex:1;background:var(--line);align-self:center}
+
+  /* ---- trial card ---- */
+  .card{
+    position:relative;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);margin:0 0 10px;overflow:hidden;
+    box-shadow:0 1px 1px rgba(21,33,28,.04);
+    transition:box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{box-shadow:var(--shadow);border-color:var(--line-strong)}
+  .spine{position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
+  .card-head{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:15px 16px 15px 22px;cursor:pointer;
+  }
+  .card-main{flex:1;min-width:0}
+  .card-titleline{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .trial-name{
+    font-family:"Newsreader",serif;font-size:19px;font-weight:600;
+    letter-spacing:-.01em;color:var(--ink);
+  }
+  .trial-year{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .badge{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;padding:2px 7px;border-radius:4px;
+    border:1px solid var(--line-strong);color:var(--muted);
+  }
+  .badge.guide{border-color:var(--signal);color:var(--signal)}
+  .one-liner{margin:5px 0 0;color:var(--muted);font-size:14px}
+  .chev{
+    flex-shrink:0;color:var(--faint);transition:transform .2s ease;margin-top:3px;
+  }
+  .card.open .chev{transform:rotate(90deg)}
+  .del{
+    background:none;border:0;color:var(--faint);font-size:13px;padding:4px 6px;
+    border-radius:5px;opacity:0;transition:opacity .15s,color .15s,background .15s;
+  }
+  .card:hover .del{opacity:1}
+  .del:hover{color:var(--danger);background:#F6ECEA}
+
+  /* ---- expanded detail ---- */
+  .detail{
+    max-height:0;overflow:hidden;transition:max-height .28s ease;
+    border-top:1px solid transparent;
+  }
+  .card.open .detail{max-height:900px;border-top-color:var(--line)}
+  .detail-inner{padding:16px 20px 20px 22px}
+  .pico{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:8px;overflow:hidden;margin:0 0 16px;
+  }
+  .pico div{background:var(--surface);padding:11px 13px}
+  .pico dt{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 4px;
+  }
+  .pico dd{margin:0;font-size:13.5px;color:var(--ink);line-height:1.4}
+  .field{margin:0 0 13px}
+  .field:last-child{margin-bottom:0}
+  .field h4{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 4px;font-weight:500;
+  }
+  .field p{margin:0;font-size:14px;color:var(--ink);line-height:1.5}
+  .field.change h4{color:var(--signal)}
+  .full-title{font-style:italic;color:var(--muted);font-size:13.5px;margin:0 0 14px;line-height:1.4}
+  .cite{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);
+    margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line-strong);
+  }
+
+  /* ---- empty ---- */
+  .empty{
+    text-align:center;padding:60px 20px;color:var(--muted);
+    border:1px dashed var(--line-strong);border-radius:var(--radius);
+    background:rgba(251,252,251,.5);margin-top:20px;
+  }
+  .empty b{color:var(--ink);font-family:"Newsreader",serif;font-size:18px;font-weight:500}
+
+  footer{
+    margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--faint);line-height:1.5;
+  }
+  footer b{color:var(--muted);font-weight:500}
+
+  @media (max-width:560px){
+    .meter{gap:18px}
+    .subrow{flex-direction:column;align-items:stretch}
+    .card-head{padding:14px 12px 14px 18px}
+  }
+  /* expand / collapse controls */
+  .toolbar{display:flex;gap:6px;flex-shrink:0}
+  .btn-ghost{
+    border:1px solid var(--line);background:var(--surface);color:var(--muted);
+    font-size:12.5px;font-weight:500;padding:8px 12px;border-radius:7px;
+    transition:border-color .15s,color .15s,background .15s;white-space:nowrap;
+  }
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+  @media (max-width:560px){
+    .toolbar{width:100%}
+    .btn-ghost{flex:1}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+  .byline{
+    margin-top:12px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+  }
+  .byline b{color:var(--accent);font-weight:500}
+
+  /* print / save-as-PDF: full document, every card expanded */
+  @media print{
+    @page{margin:14mm}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    body{background:#fff!important;padding:0!important;color:#000}
+    .wrap{max-width:none}
+    .controls,.chev,.cat-rule{display:none!important}
+    .lede{max-width:none}
+    .meter{border-top:1px solid #999}
+    h1.title{font-size:26px}
+    .cat{margin-top:20px;break-inside:avoid}
+    .cat-head{break-after:avoid;margin-bottom:8px}
+    .card{
+      break-inside:avoid;box-shadow:none!important;border:1px solid #bbb!important;
+      margin-bottom:7px;
+    }
+    .card-head{cursor:default;padding:11px 14px 11px 18px}
+    /* force every detail open regardless of on-screen toggle state */
+    .detail{max-height:none!important;overflow:visible!important;border-top:1px solid #ddd!important}
+    .detail-inner{padding:12px 16px 14px 18px}
+    .pico{border:1px solid #ccc}
+    .pico div{background:#fff}
+    .one-liner,.field p,.pico dd,.full-title{color:#000}
+    footer{margin-top:24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Surgical Critical Care &middot; Evidence Registry</p>
+    <h1 class="title">Landmark Trials <em>that moved the needle</em></h1>
+    <div class="byline">Created by <b>Dustin Latimer</b></div>
+    <p class="lede">A quick-reference set of practice-shaping trials, grouped by clinical domain. Tap any card for the full breakdown &mdash; population, intervention, comparison, outcome, and what it changed.</p>
+    <div class="meter">
+      <div><b id="mTrials">0</b><span>Trials</span></div>
+      <div><b id="mCats">0</b><span>Groupings</span></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="subrow">
+      <label class="searchbox">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="filterInput" type="text" placeholder="Filter by name, topic, or grouping" autocomplete="off">
+      </label>
+      <div class="toolbar">
+        <button class="btn-ghost" id="expandAll">Expand all</button>
+        <button class="btn-ghost" id="collapseAll">Collapse all</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="library"></main>
+
+  <footer>
+    <b>A working note.</b> These summaries are condensed for rapid recall &mdash; check the primary source before they inform care. This page runs entirely in your browser: it works offline and sends nothing anywhere.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CAT_COLORS = {
+    "Antibiotics & Infection":"#12695A",
+    "Trauma & Injury":"#A63A2A",
+    "Sepsis & Resuscitation":"#5A4A9C",
+    "Transfusion & Hemostasis":"#8C2F45",
+    "Ventilation & ARDS":"#1F5F8B",
+    "Nutrition":"#6E7A2A",
+    "Fluids & Hemodynamics":"#157A8C",
+    "Neuro & TBI":"#3A3A7A",
+    "Renal & RRT":"#7A3A6B",
+    "Cardiac Arrest & Temperature":"#B5642A",
+    "Metabolic & Glycemic":"#4E7A3A",
+    "Sedation & Delirium":"#8A5A1E",
+    "VTE Prophylaxis":"#2E6E5E",
+    "Guidelines & Source Control":"#4A5A63"
+  };
+  var FALLBACK = ["#7A5230","#3D6B4A","#6B3D5C","#2A6E7A","#7A4A2A","#4A4A2A"];
+  function catColor(name){
+    if(CAT_COLORS[name]) return CAT_COLORS[name];
+    var h=0; for(var i=0;i<name.length;i++){h=(h*31+name.charCodeAt(i))>>>0;}
+    return FALLBACK[h%FALLBACK.length];
+  }
+
+  var trials = [
+    {
+      id:"balance", type:"trial", name:"BALANCE",
+      fullTitle:"Bacteremia Antibiotic Length Actually Needed for Clinical Effectiveness",
+      year:"2025", journal:"NEJM", evidence:"RCT (noninferiority)",
+      category:"Antibiotics & Infection",
+      oneLiner:"7 days of antibiotics is non-inferior to 14 days for bloodstream infection.",
+      population:"Hospitalized and ICU patients with bacteremia (74 sites, 7 countries)",
+      intervention:"7-day antibiotic course",
+      comparison:"14-day antibiotic course",
+      outcome:"90-day mortality — 7 days met noninferiority",
+      keyFinding:"A 7-day course matched 14 days on mortality while roughly halving antibiotic exposure.",
+      practiceChange:"Supports a default 7-day course for many bloodstream infections, trimming unnecessary antibiotic days and resistance pressure.",
+      citation:"N Engl J Med 2025;392:1065-1078."
+    },
+    {
+      id:"ptx35", type:"trial", name:"35-mm Rule (Figueroa)",
+      fullTitle:"The 35-mm rule to guide pneumothorax management",
+      year:"2022", journal:"J Trauma Acute Care Surg", evidence:"Single-center retrospective (Level III)",
+      category:"Trauma & Injury",
+      oneLiner:"Stable traumatic pneumothoraces \u226435 mm can be safely observed, avoiding chest tubes.",
+      population:"Adult blunt-trauma patients, CT-diagnosed PTX, hemodynamically stable, no hemothorax",
+      intervention:"Guideline-driven observation of PTX \u226435 mm",
+      comparison:"Practice before the guideline",
+      outcome:"Chest-tube use fell 28% \u2192 18%; failure, LOS, complications unchanged",
+      keyFinding:"An objective 35-mm CT threshold expanded safe observation without more failures.",
+      practiceChange:"Gives trauma teams a concrete size cutoff to cut unnecessary tube thoracostomy in stable chest trauma.",
+      citation:"J Trauma Acute Care Surg 2022;92:951-957."
+    },
+    {
+      id:"sis-iai", type:"guideline", name:"SIS IAI Guidelines",
+      fullTitle:"Surgical Infection Society Guidelines: Management of Intra-Abdominal Infection in Adults (Huston et al.)",
+      year:"2024", journal:"Surg Infect (Larchmt)", evidence:"Guideline (GRADE)",
+      category:"Guidelines & Source Control",
+      oneLiner:"Current SIS guidance centering source control, short-course antibiotics, and de-escalation for IAI.",
+      population:"\u2014", intervention:"\u2014", comparison:"\u2014",
+      outcome:"Consolidated, RCT-based recommendations for adult intra-abdominal infection",
+      keyFinding:"Adequate source control is paramount; antibiotics are adjunctive, short-course, and de-escalated by culture.",
+      practiceChange:"Reinforces shorter durations after adequate source control and risk-stratified empiric therapy over reflexive broad-spectrum coverage.",
+      citation:"Surg Infect (Larchmt) 2024 (Huston, Barie, Forrester et al.)."
+    },
+
+    /* ---- Antibiotics & Infection ---- */
+    {
+      id:"stopit", type:"trial", name:"STOP-IT",
+      fullTitle:"Study to Optimize Peritoneal Infection Therapy",
+      year:"2015", journal:"NEJM", evidence:"RCT",
+      category:"Antibiotics & Infection",
+      oneLiner:"After adequate source control, ~4 days of antibiotics suffices for complicated intra-abdominal infection.",
+      population:"Patients with complicated IAI and adequate source control (n=518)",
+      intervention:"Fixed ~4-day antibiotic course",
+      comparison:"Longer course until 2 days after resolution of signs (up to ~8-10 days)",
+      outcome:"Composite of surgical-site infection, recurrent IAI, or death \u2014 no difference",
+      keyFinding:"A short fixed course matched a longer, symptom-guided course once source control was achieved.",
+      practiceChange:"Established short-course antibiotics after source control, reducing exposure in complicated IAI.",
+      citation:"N Engl J Med 2015;372:1996-2005."
+    },
+
+    /* ---- Trauma & Injury ---- */
+    {
+      id:"proppr", type:"trial", name:"PROPPR",
+      fullTitle:"Pragmatic, Randomized Optimal Platelet and Plasma Ratios",
+      year:"2015", journal:"JAMA", evidence:"RCT",
+      category:"Transfusion & Hemostasis",
+      oneLiner:"1:1:1 plasma:platelets:RBCs improves hemostasis and cuts exsanguination death, though overall mortality was similar.",
+      population:"Severely injured trauma patients predicted to need massive transfusion (n=680)",
+      intervention:"1:1:1 plasma:platelets:RBCs",
+      comparison:"1:1:2 ratio",
+      outcome:"24-hour and 30-day mortality \u2014 no significant difference",
+      keyFinding:"More 1:1:1 patients achieved hemostasis and fewer died of exsanguination by 24 hours.",
+      practiceChange:"Cemented balanced 1:1:1 resuscitation as the standard for trauma massive transfusion.",
+      citation:"JAMA 2015;313:471-482."
+    },
+    {
+      id:"crash2", type:"trial", name:"CRASH-2",
+      fullTitle:"Clinical Randomisation of an Antifibrinolytic in Significant Haemorrhage 2",
+      year:"2010", journal:"Lancet", evidence:"RCT",
+      category:"Trauma & Injury",
+      oneLiner:"TXA within 3 hours reduces death in bleeding trauma; given later it may worsen bleeding death.",
+      population:"Adult trauma patients with or at risk of significant hemorrhage (n=20,211, 40 countries)",
+      intervention:"Tranexamic acid (1 g bolus + 1 g over 8 h)",
+      comparison:"Placebo",
+      outcome:"28-day all-cause mortality \u2014 reduced with TXA",
+      keyFinding:"TXA lowered death from bleeding, with benefit concentrated within 3 hours of injury.",
+      practiceChange:"Made early TXA a routine part of trauma hemorrhage protocols worldwide.",
+      citation:"Lancet 2010;376:23-32."
+    },
+    {
+      id:"patch", type:"trial", name:"PATCH-Trauma",
+      fullTitle:"Pre-hospital Antifibrinolytics for Traumatic Coagulopathy and Haemorrhage",
+      year:"2023", journal:"NEJM", evidence:"RCT",
+      category:"Trauma & Injury",
+      oneLiner:"Prehospital TXA improved early survival but not favorable functional outcome at 6 months.",
+      population:"Trauma patients at risk of trauma-induced coagulopathy, prehospital (n=1310)",
+      intervention:"Prehospital tranexamic acid",
+      comparison:"Placebo",
+      outcome:"Survival with favorable function (GOS-E) at 6 months \u2014 no difference",
+      keyFinding:"TXA lowered 28-day mortality, but the extra survivors did not have better 6-month function.",
+      practiceChange:"Tempered the expectation that early TXA yields better neurologic recovery, while supporting its survival benefit.",
+      citation:"N Engl J Med 2023;389:127-136."
+    },
+
+    /* ---- Neuro & TBI ---- */
+    {
+      id:"rescueicp", type:"trial", name:"RESCUEicp",
+      fullTitle:"Randomised Evaluation of Surgery with Craniectomy for Uncontrollable Elevation of ICP",
+      year:"2016", journal:"NEJM", evidence:"RCT",
+      category:"Neuro & TBI",
+      oneLiner:"Craniectomy for refractory ICP cuts death but increases survival with severe disability.",
+      population:"TBI patients with refractory intracranial hypertension (n=408)",
+      intervention:"Decompressive craniectomy",
+      comparison:"Continued medical management",
+      outcome:"6-month GOS-E \u2014 lower mortality, more severe disability/vegetative state",
+      keyFinding:"Surgery converts some deaths into survival with major disability \u2014 a value-laden trade-off.",
+      practiceChange:"Framed craniectomy as life-saving but disability-increasing, demanding shared decision-making.",
+      citation:"N Engl J Med 2016;375:1119-1130."
+    },
+    {
+      id:"decra", type:"trial", name:"DECRA",
+      fullTitle:"Decompressive Craniectomy in Diffuse Traumatic Brain Injury",
+      year:"2011", journal:"NEJM", evidence:"RCT",
+      category:"Neuro & TBI",
+      oneLiner:"Early craniectomy for diffuse TBI lowered ICP but led to worse neurological outcomes.",
+      population:"Severe diffuse TBI with moderately raised ICP (n=155)",
+      intervention:"Early bifrontotemporoparietal decompressive craniectomy",
+      comparison:"Standard medical care",
+      outcome:"6-month GOS-E \u2014 worse in the surgical group despite lower ICP",
+      keyFinding:"Lowering ICP surgically did not translate to better function and was linked to worse outcomes.",
+      practiceChange:"Discouraged early craniectomy for moderately raised ICP as a routine strategy.",
+      citation:"N Engl J Med 2011;364:1493-1502."
+    },
+    {
+      id:"besttrip", type:"trial", name:"BEST TRIP",
+      fullTitle:"Benchmark Evidence from South American Trials: Treatment of ICP",
+      year:"2012", journal:"NEJM", evidence:"RCT",
+      category:"Neuro & TBI",
+      oneLiner:"ICP-monitor-guided care was not superior to imaging and clinical exam alone in severe TBI.",
+      population:"Severe TBI patients (n=324, Bolivia and Ecuador)",
+      intervention:"Management guided by intracranial pressure monitoring",
+      comparison:"Management guided by imaging and clinical examination",
+      outcome:"Composite functional/survival score \u2014 no difference",
+      keyFinding:"A protocol without invasive ICP monitoring performed comparably in this setting.",
+      practiceChange:"Challenged the assumption that ICP monitoring itself improves outcomes and reframed how it should be used.",
+      citation:"N Engl J Med 2012;367:2471-2481."
+    },
+
+    /* ---- Ventilation & ARDS ---- */
+    {
+      id:"arma", type:"trial", name:"ARDSNet ARMA",
+      fullTitle:"Ventilation with Lower Tidal Volumes for Acute Lung Injury and ARDS",
+      year:"2000", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Low tidal volume (6 mL/kg predicted body weight) reduces mortality in ARDS.",
+      population:"Patients with acute lung injury / ARDS on mechanical ventilation (n=861)",
+      intervention:"Tidal volume 6 mL/kg predicted body weight, plateau \u226430",
+      comparison:"Tidal volume 12 mL/kg",
+      outcome:"In-hospital mortality \u2014 31% vs 40%",
+      keyFinding:"Lung-protective low tidal volume cut mortality and increased ventilator-free days.",
+      practiceChange:"Made lung-protective ventilation the standard of care for ARDS.",
+      citation:"N Engl J Med 2000;342:1301-1308."
+    },
+    {
+      id:"proseva", type:"trial", name:"PROSEVA",
+      fullTitle:"Prone Positioning in Severe Acute Respiratory Distress Syndrome",
+      year:"2013", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Early, prolonged prone positioning markedly reduces mortality in severe ARDS.",
+      population:"Severe ARDS with P/F ratio <150 (n=466)",
+      intervention:"Prone positioning \u226516 h/day",
+      comparison:"Supine positioning",
+      outcome:"28-day mortality \u2014 16% vs 33%",
+      keyFinding:"Proning roughly halved mortality in severe ARDS with experienced teams.",
+      practiceChange:"Established early prolonged proning as standard for severe ARDS.",
+      citation:"N Engl J Med 2013;368:2159-2168."
+    },
+    {
+      id:"factt", type:"trial", name:"FACTT",
+      fullTitle:"Fluid and Catheter Treatment Trial (ARDS Network)",
+      year:"2006", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"A conservative fluid strategy in ARDS improves ventilator-free days without raising mortality.",
+      population:"Patients with acute lung injury / ARDS (n=1000)",
+      intervention:"Conservative fluid management",
+      comparison:"Liberal fluid management",
+      outcome:"60-day mortality \u2014 no difference; more ventilator-free days with conservative",
+      keyFinding:"Keeping ARDS patients dry improved lung function and shortened ventilation without harming kidneys.",
+      practiceChange:"Supported conservative fluid balance once ARDS patients are out of shock.",
+      citation:"N Engl J Med 2006;354:2564-2575."
+    },
+    {
+      id:"acurasys", type:"trial", name:"ACURASYS",
+      fullTitle:"Neuromuscular Blockers in Early Acute Respiratory Distress Syndrome",
+      year:"2010", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Early 48-hour paralysis suggested a survival benefit in severe ARDS.",
+      population:"Severe ARDS with P/F ratio <150 (n=340)",
+      intervention:"Cisatracurium infusion for 48 hours",
+      comparison:"Placebo",
+      outcome:"90-day mortality \u2014 improved after adjustment; more ventilator-free days",
+      keyFinding:"Early short-course paralysis improved outcomes without increasing ICU-acquired weakness.",
+      practiceChange:"Popularized early neuromuscular blockade in severe ARDS \u2014 later tempered by ROSE.",
+      citation:"N Engl J Med 2010;363:1107-1116."
+    },
+    {
+      id:"rose", type:"trial", name:"ROSE",
+      fullTitle:"Reevaluation of Systemic Early Neuromuscular Blockade (PETAL)",
+      year:"2019", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Routine early paralysis gave no mortality benefit in moderate-severe ARDS with modern light sedation.",
+      population:"Moderate-to-severe ARDS with P/F ratio <150 (n=1006)",
+      intervention:"Early continuous cisatracurium (48 h)",
+      comparison:"Usual care with lighter sedation targets",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"With a lighter-sedation control strategy, routine paralysis did not improve survival.",
+      practiceChange:"Walked back routine early paralysis in ARDS (contrasting ACURASYS), reserving it for selected cases.",
+      citation:"N Engl J Med 2019;380:1997-2008."
+    },
+
+    /* ---- Sepsis & Resuscitation ---- */
+    {
+      id:"rivers-egdt", type:"trial", name:"Rivers EGDT",
+      fullTitle:"Early Goal-Directed Therapy in the Treatment of Severe Sepsis and Septic Shock",
+      year:"2001", journal:"NEJM", evidence:"RCT (single-center)",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Early goal-directed resuscitation cut sepsis mortality \u2014 later shown unnecessary as a rigid protocol.",
+      population:"ED patients with severe sepsis or septic shock (n=263, single center)",
+      intervention:"Protocolized EGDT with ScvO\u2082-guided targets (first 6 h)",
+      comparison:"Standard therapy",
+      outcome:"In-hospital mortality \u2014 30.5% vs 46.5%",
+      keyFinding:"Aggressive early resuscitation dramatically lowered mortality in the original trial.",
+      practiceChange:"Launched the early-sepsis-resuscitation era; later trials showed the rigid ScvO\u2082 protocol was not the key ingredient.",
+      citation:"N Engl J Med 2001;345:1368-1377."
+    },
+    {
+      id:"process", type:"trial", name:"ProCESS",
+      fullTitle:"Protocolized Care for Early Septic Shock",
+      year:"2014", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Protocolized EGDT was no better than usual care for early septic shock.",
+      population:"ED patients with septic shock (n=1341, US multicenter)",
+      intervention:"Protocol-based EGDT (ScvO\u2082 targets)",
+      comparison:"Protocol-based standard therapy or usual care",
+      outcome:"60-day mortality \u2014 no difference",
+      keyFinding:"Mandatory central venous oxygen monitoring and rigid protocols added no survival benefit.",
+      practiceChange:"Helped retire mandatory EGDT in favor of prompt fluids, antibiotics, and vasopressors.",
+      citation:"N Engl J Med 2014;370:1683-1693."
+    },
+    {
+      id:"arise", type:"trial", name:"ARISE",
+      fullTitle:"Australasian Resuscitation in Sepsis Evaluation",
+      year:"2014", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"EGDT did not improve survival over usual care in early septic shock.",
+      population:"ED patients with early septic shock (n=1600, Australasia)",
+      intervention:"Early goal-directed therapy",
+      comparison:"Usual care",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Confirmed ProCESS: protocolized EGDT offered no mortality advantage.",
+      practiceChange:"Reinforced abandoning mandatory EGDT while keeping early recognition and treatment.",
+      citation:"N Engl J Med 2014;371:1496-1506."
+    },
+
+    /* ---- Transfusion & Hemostasis ---- */
+    {
+      id:"tricc", type:"trial", name:"TRICC",
+      fullTitle:"Transfusion Requirements in Critical Care",
+      year:"1999", journal:"NEJM", evidence:"RCT",
+      category:"Transfusion & Hemostasis",
+      oneLiner:"A restrictive transfusion threshold (~7 g/dL) is at least as safe as liberal in most ICU patients.",
+      population:"Euvolemic critically ill adults (n=838)",
+      intervention:"Restrictive transfusion (threshold 7 g/dL)",
+      comparison:"Liberal transfusion (threshold 10 g/dL)",
+      outcome:"30-day mortality \u2014 no significant difference",
+      keyFinding:"Restrictive transfusion was safe overall and possibly better in younger, less-ill patients.",
+      practiceChange:"Shifted ICU practice to restrictive transfusion thresholds, curbing unnecessary blood use.",
+      citation:"N Engl J Med 1999;340:409-417."
+    },
+
+    /* ---- Fluids & Hemodynamics ---- */
+    {
+      id:"safe", type:"trial", name:"SAFE",
+      fullTitle:"Saline versus Albumin Fluid Evaluation",
+      year:"2004", journal:"NEJM", evidence:"RCT",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"Albumin and saline gave similar overall outcomes for ICU fluid resuscitation.",
+      population:"Heterogeneous ICU patients needing volume resuscitation (n=6997)",
+      intervention:"4% albumin",
+      comparison:"0.9% saline",
+      outcome:"28-day all-cause mortality \u2014 no difference",
+      keyFinding:"Overall equivalent, with signals of harm in TBI and possible benefit in sepsis subgroups.",
+      practiceChange:"Reassured that saline is a reasonable default and albumin is safe but not superior; cautioned against albumin in TBI.",
+      citation:"N Engl J Med 2004;350:2247-2256."
+    },
+    {
+      id:"smart", type:"trial", name:"SMART",
+      fullTitle:"Isotonic Solutions and Major Adverse Renal Events Trial",
+      year:"2018", journal:"NEJM", evidence:"RCT (pragmatic)",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"Balanced crystalloids modestly reduce major adverse kidney events versus saline in the ICU.",
+      population:"Adult ICU patients (n=15,802, single center)",
+      intervention:"Balanced crystalloids (lactated Ringer's / Plasma-Lyte)",
+      comparison:"0.9% saline",
+      outcome:"MAKE30 (death, new dialysis, persistent renal dysfunction) \u2014 lower with balanced",
+      keyFinding:"Balanced fluids reduced the composite kidney outcome by a small but significant margin.",
+      practiceChange:"Nudged default ICU resuscitation toward balanced crystalloids over saline.",
+      citation:"N Engl J Med 2018;378:829-839."
+    },
+
+    /* ---- VTE Prophylaxis ---- */
+    {
+      id:"protect", type:"trial", name:"PROTECT",
+      fullTitle:"Prophylaxis for Thromboembolism in Critical Care Trial",
+      year:"2011", journal:"NEJM", evidence:"RCT",
+      category:"VTE Prophylaxis",
+      oneLiner:"LMWH and UFH prevent DVT similarly, but LMWH reduced pulmonary embolism.",
+      population:"Medical-surgical ICU patients (n=3746)",
+      intervention:"Dalteparin (LMWH)",
+      comparison:"Unfractionated heparin",
+      outcome:"Proximal DVT \u2014 no difference; PE lower with LMWH",
+      keyFinding:"Equivalent DVT prevention; LMWH cut PE without increasing bleeding or HIT.",
+      practiceChange:"Supported LMWH as a reasonable, possibly preferable ICU thromboprophylaxis agent.",
+      citation:"N Engl J Med 2011;364:1305-1314."
+    },
+
+    /* ---- Sedation & Delirium ---- */
+    {
+      id:"abcde", type:"trial", name:"ABCDE / ABC Trial",
+      fullTitle:"Awakening and Breathing Controlled Trial (foundation of the ABCDE bundle)",
+      year:"2008", journal:"Lancet", evidence:"RCT (bundle framework)",
+      category:"Sedation & Delirium",
+      oneLiner:"Pairing daily awakening and breathing trials improves ventilator-free days and survival.",
+      population:"Mechanically ventilated ICU patients (ABC trial, n=336)",
+      intervention:"Paired spontaneous awakening + breathing trials",
+      comparison:"Usual sedation with breathing trials alone",
+      outcome:"More ventilator-free days; lower 1-year mortality",
+      keyFinding:"Coordinated sedation interruption and weaning got patients off the ventilator faster and improved survival.",
+      practiceChange:"Anchored the ABCDE bundle \u2014 awakening, breathing, coordination, delirium monitoring, early mobility \u2014 in ICU care.",
+      citation:"ABC trial: Lancet 2008;371:126-134."
+    },
+
+    /* ---- Ventilation & ARDS (additions) ---- */
+    {
+      id:"art", type:"trial", name:"ART",
+      fullTitle:"Alveolar Recruitment for Acute Respiratory Distress Syndrome Trial",
+      year:"2017", journal:"JAMA", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Aggressive lung recruitment with high PEEP increased mortality in moderate-severe ARDS.",
+      population:"Moderate-to-severe ARDS (n=1010)",
+      intervention:"Lung recruitment maneuver + PEEP titrated to best compliance",
+      comparison:"Low PEEP (ARDSNet strategy)",
+      outcome:"28-day mortality \u2014 higher with recruitment (55% vs 49%)",
+      keyFinding:"Routine aggressive recruitment/high PEEP caused more death and barotrauma.",
+      practiceChange:"Cautioned against routine aggressive recruitment maneuvers in ARDS.",
+      citation:"JAMA 2017;318:1335-1345."
+    },
+    {
+      id:"eolia", type:"trial", name:"EOLIA",
+      fullTitle:"ECMO to Rescue Lung Injury in Severe ARDS",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Ventilation & ARDS",
+      oneLiner:"Early ECMO for very severe ARDS showed a mortality signal that missed statistical significance.",
+      population:"Very severe ARDS (n=249)",
+      intervention:"Early veno-venous ECMO",
+      comparison:"Conventional ventilation with ECMO as rescue",
+      outcome:"60-day mortality \u2014 35% vs 46%, not significant (p=0.09)",
+      keyFinding:"A non-significant mortality reduction, confounded by frequent rescue crossover to ECMO.",
+      practiceChange:"Kept ECMO as a rescue option and fueled ongoing debate over early ECMO in refractory ARDS.",
+      citation:"N Engl J Med 2018;378:1965-1975."
+    },
+
+    /* ---- Sepsis & Resuscitation (additions) ---- */
+    {
+      id:"promise", type:"trial", name:"ProMISe",
+      fullTitle:"Protocolised Management in Sepsis",
+      year:"2015", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"EGDT offered no survival benefit over usual care \u2014 completing the EGDT trilogy.",
+      population:"ED patients with early septic shock (n=1260, UK)",
+      intervention:"Early goal-directed therapy",
+      comparison:"Usual care",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"The third large trial confirming protocolized EGDT does not improve survival.",
+      practiceChange:"With ProCESS and ARISE, definitively retired mandatory EGDT protocols.",
+      citation:"N Engl J Med 2015;372:1301-1311."
+    },
+    {
+      id:"vasst", type:"trial", name:"VASST",
+      fullTitle:"Vasopressin and Septic Shock Trial",
+      year:"2008", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Adding low-dose vasopressin to norepinephrine did not improve overall survival in septic shock.",
+      population:"Septic shock on vasopressors (n=778)",
+      intervention:"Low-dose vasopressin + norepinephrine",
+      comparison:"Norepinephrine alone",
+      outcome:"28-day mortality \u2014 no difference overall",
+      keyFinding:"No overall benefit, with a possible signal in the less-severe shock subgroup.",
+      practiceChange:"Supported vasopressin as a catecholamine-sparing adjunct rather than a mortality-improving agent.",
+      citation:"N Engl J Med 2008;358:877-887."
+    },
+    {
+      id:"vanish", type:"trial", name:"VANISH",
+      fullTitle:"Vasopressin vs Norepinephrine as Initial Therapy in Septic Shock",
+      year:"2016", journal:"JAMA", evidence:"RCT (factorial)",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Early vasopressin vs norepinephrine did not change kidney-failure-free days in septic shock.",
+      population:"Septic shock (n=409)",
+      intervention:"Vasopressin as initial vasopressor (\u00b1 hydrocortisone)",
+      comparison:"Norepinephrine",
+      outcome:"Kidney-failure-free days \u2014 no difference",
+      keyFinding:"No renal-outcome benefit, though vasopressin reduced the need for renal replacement.",
+      practiceChange:"Did not establish vasopressin as first-line; reinforced norepinephrine as default.",
+      citation:"JAMA 2016;316:509-518."
+    },
+    {
+      id:"corticus", type:"trial", name:"CORTICUS",
+      fullTitle:"Corticosteroid Therapy of Septic Shock",
+      year:"2008", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Hydrocortisone hastened shock reversal but did not improve survival in septic shock.",
+      population:"Septic shock (n=499)",
+      intervention:"Hydrocortisone",
+      comparison:"Placebo",
+      outcome:"28-day mortality \u2014 no difference",
+      keyFinding:"Faster shock reversal without a survival benefit, and more superinfections.",
+      practiceChange:"Cooled enthusiasm for routine steroids and de-emphasized ACTH stimulation testing.",
+      citation:"N Engl J Med 2008;358:111-124."
+    },
+    {
+      id:"adrenal", type:"trial", name:"ADRENAL",
+      fullTitle:"Adjunctive Corticosteroid Treatment in Critically Ill Patients with Septic Shock",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Hydrocortisone sped shock resolution but did not reduce 90-day mortality in septic shock.",
+      population:"Ventilated patients with septic shock (n=3800)",
+      intervention:"Continuous hydrocortisone infusion",
+      comparison:"Placebo",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Faster shock reversal and extubation without a mortality benefit.",
+      practiceChange:"Positioned steroids for faster shock reversal, not survival, in septic shock.",
+      citation:"N Engl J Med 2018;378:797-808."
+    },
+    {
+      id:"aprocchss", type:"trial", name:"APROCCHSS",
+      fullTitle:"Activated Protein C and Corticosteroids for Human Septic Shock",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Sepsis & Resuscitation",
+      oneLiner:"Hydrocortisone plus fludrocortisone reduced mortality in severe septic shock.",
+      population:"Severe septic shock (n=1241)",
+      intervention:"Hydrocortisone + fludrocortisone",
+      comparison:"Placebo",
+      outcome:"90-day mortality \u2014 43% vs 49%",
+      keyFinding:"A mortality benefit (contrasting ADRENAL), possibly reflecting sicker patients and added fludrocortisone.",
+      practiceChange:"Revived support for combined steroids in severe or refractory septic shock.",
+      citation:"N Engl J Med 2018;378:809-818."
+    },
+
+    /* ---- Fluids & Hemodynamics (additions) ---- */
+    {
+      id:"salt-ed", type:"trial", name:"SALT-ED",
+      fullTitle:"Balanced Crystalloids versus Saline in Noncritically Ill Adults",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"In non-critically-ill ED patients, balanced crystalloids modestly reduced major kidney events vs saline.",
+      population:"Non-critically-ill ED adults needing IV fluids (n=13,347)",
+      intervention:"Balanced crystalloids",
+      comparison:"0.9% saline",
+      outcome:"MAKE30 \u2014 lower with balanced; hospital-free days unchanged",
+      keyFinding:"Extends SMART's kidney signal to the ward and ED population.",
+      practiceChange:"Broadened the case for balanced crystalloids beyond the ICU.",
+      citation:"N Engl J Med 2018;378:819-828."
+    },
+    {
+      id:"chest", type:"trial", name:"CHEST",
+      fullTitle:"Hydroxyethyl Starch or Saline for Fluid Resuscitation in Intensive Care",
+      year:"2012", journal:"NEJM", evidence:"RCT",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"Hydroxyethyl starch increased kidney injury and dialysis without improving survival.",
+      population:"ICU patients needing resuscitation (n\u22487000)",
+      intervention:"6% HES 130/0.4",
+      comparison:"0.9% saline",
+      outcome:"90-day mortality \u2014 no difference; more renal replacement with HES",
+      keyFinding:"Starch raised RRT and adverse events with no survival benefit.",
+      practiceChange:"Contributed to abandoning hydroxyethyl starch in critically ill patients.",
+      citation:"N Engl J Med 2012;367:1901-1911."
+    },
+    {
+      id:"6s", type:"trial", name:"6S",
+      fullTitle:"Scandinavian Starch for Severe Sepsis/Septic Shock Trial",
+      year:"2012", journal:"NEJM", evidence:"RCT",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"HES increased death and dialysis versus Ringer's in severe sepsis.",
+      population:"Severe sepsis (n=800)",
+      intervention:"HES 130/0.42",
+      comparison:"Ringer's acetate",
+      outcome:"90-day mortality \u2014 higher with HES; more RRT",
+      keyFinding:"Starch caused excess mortality and renal replacement in sepsis.",
+      practiceChange:"Helped end starch use in sepsis resuscitation.",
+      citation:"N Engl J Med 2012;367:124-134."
+    },
+    {
+      id:"classic", type:"trial", name:"CLASSIC",
+      fullTitle:"Restriction of Intravenous Fluid in ICU Patients with Septic Shock",
+      year:"2022", journal:"NEJM", evidence:"RCT",
+      category:"Fluids & Hemodynamics",
+      oneLiner:"Restricting IV fluids in septic shock did not change 90-day mortality vs standard care.",
+      population:"Adults with septic shock in the ICU (n=1554)",
+      intervention:"Restrictive IV fluid strategy",
+      comparison:"Standard IV fluids",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Fluid restriction was safe but did not improve survival.",
+      practiceChange:"Suggested no benefit to strict restriction, and no mandate for aggressive ongoing fluids either.",
+      citation:"N Engl J Med 2022;386:2459-2470."
+    },
+
+    /* ---- Renal & RRT ---- */
+    {
+      id:"akiki", type:"trial", name:"AKIKI",
+      fullTitle:"Artificial Kidney Initiation in Kidney Injury",
+      year:"2016", journal:"NEJM", evidence:"RCT",
+      category:"Renal & RRT",
+      oneLiner:"Early vs delayed dialysis initiation in severe AKI showed no survival difference.",
+      population:"ICU patients with KDIGO stage 3 AKI on ventilation or pressors (n=620)",
+      intervention:"Early renal replacement therapy",
+      comparison:"Delayed RRT (started for urgent indications)",
+      outcome:"60-day mortality \u2014 no difference",
+      keyFinding:"Delaying dialysis avoided it entirely in many patients without harming survival.",
+      practiceChange:"Supported a watchful, indication-driven approach to starting dialysis in AKI.",
+      citation:"N Engl J Med 2016;375:122-133."
+    },
+    {
+      id:"elain", type:"trial", name:"ELAIN",
+      fullTitle:"Early vs Delayed Initiation of RRT in Acute Kidney Injury",
+      year:"2016", journal:"JAMA", evidence:"RCT (single-center)",
+      category:"Renal & RRT",
+      oneLiner:"In mostly surgical patients, earlier dialysis reduced 90-day mortality (contrasting AKIKI).",
+      population:"Critically ill, largely surgical patients with AKI (n=231, single center)",
+      intervention:"Early RRT (KDIGO stage 2)",
+      comparison:"Delayed RRT (KDIGO stage 3)",
+      outcome:"90-day mortality \u2014 lower with early RRT",
+      keyFinding:"Earlier initiation improved survival in a surgical-heavy single-center cohort.",
+      practiceChange:"Kept the early-versus-late timing debate open, especially in surgical patients.",
+      citation:"JAMA 2016;315:2190-2199."
+    },
+    {
+      id:"ideal-icu", type:"trial", name:"IDEAL-ICU",
+      fullTitle:"Initiation of Dialysis Early or Delayed in the ICU",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Renal & RRT",
+      oneLiner:"Early vs delayed dialysis in septic-shock AKI made no difference to survival.",
+      population:"Septic shock with severe AKI (n=488)",
+      intervention:"Early RRT (within 12 h)",
+      comparison:"Delayed RRT (48 h or urgent indication)",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Aligned with AKIKI: no benefit to early initiation in this population.",
+      practiceChange:"Reinforced awaiting clear indications before starting dialysis.",
+      citation:"N Engl J Med 2018;379:1431-1442."
+    },
+    {
+      id:"starrt-aki", type:"trial", name:"STARRT-AKI",
+      fullTitle:"Standard vs Accelerated Initiation of RRT in Acute Kidney Injury",
+      year:"2020", journal:"NEJM", evidence:"RCT",
+      category:"Renal & RRT",
+      oneLiner:"Accelerated dialysis did not improve survival and left more patients dialysis-dependent.",
+      population:"Critically ill adults with AKI (n=3019)",
+      intervention:"Accelerated RRT initiation",
+      comparison:"Standard (delayed) initiation",
+      outcome:"90-day mortality \u2014 no difference; more RRT dependence with accelerated",
+      keyFinding:"The largest trial confirmed no survival benefit and a dependence signal with early start.",
+      practiceChange:"Settled practice toward standard, indication-based dialysis timing.",
+      citation:"N Engl J Med 2020;383:240-251."
+    },
+
+    /* ---- Sedation & Delirium (additions) ---- */
+    {
+      id:"mends", type:"trial", name:"MENDS",
+      fullTitle:"Maximizing Efficacy of Targeted Sedation and Reducing Neurological Dysfunction",
+      year:"2007", journal:"JAMA", evidence:"RCT",
+      category:"Sedation & Delirium",
+      oneLiner:"Dexmedetomidine sedation yielded more delirium/coma-free days than a benzodiazepine.",
+      population:"Ventilated ICU patients (n=106)",
+      intervention:"Dexmedetomidine",
+      comparison:"Lorazepam",
+      outcome:"More days alive without delirium or coma with dexmedetomidine",
+      keyFinding:"A non-benzodiazepine strategy reduced acute brain dysfunction.",
+      practiceChange:"Helped establish dexmedetomidine as a delirium-sparing sedative.",
+      citation:"JAMA 2007;298:2644-2653."
+    },
+    {
+      id:"sedcom", type:"trial", name:"SEDCOM",
+      fullTitle:"Safety and Efficacy of Dexmedetomidine Compared with Midazolam",
+      year:"2009", journal:"JAMA", evidence:"RCT",
+      category:"Sedation & Delirium",
+      oneLiner:"Dexmedetomidine matched midazolam for sedation with less delirium and faster extubation.",
+      population:"Ventilated ICU patients needing prolonged sedation (n=375)",
+      intervention:"Dexmedetomidine",
+      comparison:"Midazolam",
+      outcome:"Time at target sedation similar; less delirium, shorter ventilation with dex",
+      keyFinding:"Comparable sedation with reduced delirium and quicker extubation.",
+      practiceChange:"Reinforced preference for non-benzodiazepine sedation in the ICU.",
+      citation:"JAMA 2009;301:489-499."
+    },
+    {
+      id:"mind-usa", type:"trial", name:"MIND-USA",
+      fullTitle:"Modifying the Impact of ICU-Associated Neurological Dysfunction \u2013 USA",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Sedation & Delirium",
+      oneLiner:"Antipsychotics did not shorten ICU delirium versus placebo.",
+      population:"ICU patients with delirium (n=566)",
+      intervention:"Haloperidol or ziprasidone",
+      comparison:"Placebo",
+      outcome:"Days alive without delirium or coma \u2014 no difference",
+      keyFinding:"Neither antipsychotic altered delirium duration or outcomes.",
+      practiceChange:"Discouraged routine antipsychotics for treating ICU delirium.",
+      citation:"N Engl J Med 2018;379:2506-2516."
+    },
+    {
+      id:"spice3", type:"trial", name:"SPICE III",
+      fullTitle:"Early Sedation with Dexmedetomidine in Critically Ill Patients",
+      year:"2019", journal:"NEJM", evidence:"RCT",
+      category:"Sedation & Delirium",
+      oneLiner:"Dexmedetomidine as the primary early sedative did not improve mortality vs usual care.",
+      population:"Ventilated ICU patients requiring early sedation (n=4000)",
+      intervention:"Early dexmedetomidine as primary sedative",
+      comparison:"Usual-care sedation",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"No survival benefit, frequent need for supplemental sedation, and more bradycardia/hypotension.",
+      practiceChange:"Tempered use of dexmedetomidine as a sole primary sedative.",
+      citation:"N Engl J Med 2019;380:2506-2517."
+    },
+
+    /* ---- Nutrition ---- */
+    {
+      id:"eden", type:"trial", name:"EDEN",
+      fullTitle:"Initial Trophic vs Full Enteral Feeding in Acute Lung Injury",
+      year:"2012", journal:"JAMA", evidence:"RCT",
+      category:"Nutrition",
+      oneLiner:"Trophic (low-volume) early enteral feeding matched full feeding in ARDS.",
+      population:"Mechanically ventilated ALI/ARDS patients (n=1000)",
+      intervention:"Trophic enteral feeding for the first 6 days",
+      comparison:"Full enteral feeding",
+      outcome:"Ventilator-free days and 60-day mortality \u2014 no difference",
+      keyFinding:"Low-volume early feeding was as good as full feeding, with less GI intolerance.",
+      practiceChange:"Made trophic early feeds an acceptable option in early ARDS.",
+      citation:"JAMA 2012;307:795-803."
+    },
+    {
+      id:"epanic", type:"trial", name:"EPaNIC",
+      fullTitle:"Early vs Late Parenteral Nutrition in Critically Ill Adults",
+      year:"2011", journal:"NEJM", evidence:"RCT",
+      category:"Nutrition",
+      oneLiner:"Delaying supplemental parenteral nutrition to day 8 sped recovery and cut infections.",
+      population:"ICU patients at nutritional risk (n=4640)",
+      intervention:"Early parenteral nutrition (days 1-2)",
+      comparison:"Late parenteral nutrition (day 8)",
+      outcome:"Faster ICU discharge, fewer infections, less RRT with late PN",
+      keyFinding:"Withholding early PN improved recovery and reduced complications.",
+      practiceChange:"Established tolerating an early caloric deficit rather than rushing parenteral nutrition.",
+      citation:"N Engl J Med 2011;365:506-517."
+    },
+    {
+      id:"target", type:"trial", name:"TARGET",
+      fullTitle:"Energy-Dense versus Routine Enteral Nutrition in the Critically Ill",
+      year:"2018", journal:"NEJM", evidence:"RCT",
+      category:"Nutrition",
+      oneLiner:"Energy-dense enteral feeding delivered more calories but did not improve survival.",
+      population:"Mechanically ventilated ICU patients (n\u22483957)",
+      intervention:"Energy-dense enteral nutrition (1.5 kcal/mL)",
+      comparison:"Routine formula (1.0 kcal/mL)",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"More calories did not translate into better outcomes.",
+      practiceChange:"Argued against pushing higher caloric density for its own sake.",
+      citation:"N Engl J Med 2018;379:1823-1834."
+    },
+    {
+      id:"permit", type:"trial", name:"PERMIT",
+      fullTitle:"Permissive Underfeeding vs Target Enteral Feeding in Critically Ill Adults",
+      year:"2015", journal:"NEJM", evidence:"RCT",
+      category:"Nutrition",
+      oneLiner:"Permissive underfeeding matched full-calorie feeding on mortality when protein was maintained.",
+      population:"Critically ill adults on enteral nutrition (n=894)",
+      intervention:"Permissive underfeeding (40-60% caloric target)",
+      comparison:"Full caloric feeding",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Lower calorie delivery was not harmful when protein targets were met.",
+      practiceChange:"Supported that hitting full caloric targets early is not essential.",
+      citation:"N Engl J Med 2015;372:2398-2408."
+    },
+    {
+      id:"calories", type:"trial", name:"CALORIES",
+      fullTitle:"Trial of the Route of Early Nutritional Support in Critically Ill Adults",
+      year:"2014", journal:"NEJM", evidence:"RCT",
+      category:"Nutrition",
+      oneLiner:"Early parenteral and enteral nutrition produced similar mortality.",
+      population:"ICU patients needing early nutrition support (n=2400)",
+      intervention:"Early parenteral nutrition",
+      comparison:"Early enteral nutrition",
+      outcome:"30-day mortality \u2014 no difference",
+      keyFinding:"Route of early nutrition did not affect survival; enteral remained cheaper and preferred.",
+      practiceChange:"Reaffirmed enteral-first without penalizing parenteral when it is needed.",
+      citation:"N Engl J Med 2014;371:1673-1684."
+    },
+
+    /* ---- Transfusion & Hemostasis (addition) ---- */
+    {
+      id:"triss", type:"trial", name:"TRISS",
+      fullTitle:"Transfusion Requirements in Septic Shock",
+      year:"2014", journal:"NEJM", evidence:"RCT",
+      category:"Transfusion & Hemostasis",
+      oneLiner:"A restrictive transfusion threshold (7 g/dL) was safe in septic shock.",
+      population:"Patients with septic shock and anemia (n=1005)",
+      intervention:"Restrictive transfusion (Hgb 7 g/dL)",
+      comparison:"Liberal transfusion (Hgb 9 g/dL)",
+      outcome:"90-day mortality \u2014 no difference",
+      keyFinding:"Fewer transfusions with equivalent outcomes in septic shock.",
+      practiceChange:"Extended restrictive transfusion practice into septic shock.",
+      citation:"N Engl J Med 2014;371:1381-1391."
+    },
+
+    /* ---- Cardiac Arrest & Temperature ---- */
+    {
+      id:"haca", type:"trial", name:"HACA",
+      fullTitle:"Hypothermia After Cardiac Arrest",
+      year:"2002", journal:"NEJM", evidence:"RCT",
+      category:"Cardiac Arrest & Temperature",
+      oneLiner:"Cooling to 32-34\u00b0C after VF cardiac arrest improved neurologic outcome and survival.",
+      population:"Comatose survivors of out-of-hospital VF arrest (n=275)",
+      intervention:"Therapeutic hypothermia 32-34\u00b0C for 24 h",
+      comparison:"Standard normothermia",
+      outcome:"Favorable neurologic outcome at 6 months \u2014 improved with cooling",
+      keyFinding:"Mild hypothermia improved neurologic recovery and survival.",
+      practiceChange:"Launched targeted temperature management after cardiac arrest.",
+      citation:"N Engl J Med 2002;346:549-556."
+    },
+    {
+      id:"ttm", type:"trial", name:"TTM",
+      fullTitle:"Targeted Temperature Management at 33\u00b0C versus 36\u00b0C after Cardiac Arrest",
+      year:"2013", journal:"NEJM", evidence:"RCT",
+      category:"Cardiac Arrest & Temperature",
+      oneLiner:"After cardiac arrest, targeting 33\u00b0C was no better than 36\u00b0C.",
+      population:"Comatose survivors of out-of-hospital cardiac arrest (n=950)",
+      intervention:"Targeted temperature 33\u00b0C",
+      comparison:"Targeted temperature 36\u00b0C",
+      outcome:"All-cause mortality and neurologic outcome \u2014 no difference",
+      keyFinding:"Preventing fever mattered more than deep cooling.",
+      practiceChange:"Shifted TTM targets upward toward 36\u00b0C and fever avoidance.",
+      citation:"N Engl J Med 2013;369:2197-2206."
+    },
+    {
+      id:"ttm2", type:"trial", name:"TTM2",
+      fullTitle:"Hypothermia versus Normothermia after Out-of-Hospital Cardiac Arrest",
+      year:"2021", journal:"NEJM", evidence:"RCT",
+      category:"Cardiac Arrest & Temperature",
+      oneLiner:"Hypothermia (33\u00b0C) did not beat normothermia with fever control after cardiac arrest.",
+      population:"Comatose survivors of out-of-hospital cardiac arrest (n=1900)",
+      intervention:"Hypothermia 33\u00b0C",
+      comparison:"Targeted normothermia (treat fever \u226537.8\u00b0C)",
+      outcome:"6-month mortality and function \u2014 no difference",
+      keyFinding:"Active cooling offered no advantage over aggressive fever prevention.",
+      practiceChange:"Moved guidelines toward fever avoidance rather than routine hypothermia.",
+      citation:"N Engl J Med 2021;384:2283-2294."
+    },
+
+    /* ---- Metabolic & Glycemic ---- */
+    {
+      id:"leuven", type:"trial", name:"Leuven Surgical ICU",
+      fullTitle:"Intensive Insulin Therapy in Critically Ill Surgical Patients (Van den Berghe)",
+      year:"2001", journal:"NEJM", evidence:"RCT (single-center)",
+      category:"Metabolic & Glycemic",
+      oneLiner:"Tight glucose control (80-110) reduced mortality in surgical ICU patients \u2014 later challenged.",
+      population:"Surgical ICU patients, largely post-cardiac surgery (n=1548)",
+      intervention:"Intensive insulin (glucose 80-110 mg/dL)",
+      comparison:"Conventional glucose control (180-200 mg/dL)",
+      outcome:"ICU mortality \u2014 reduced with tight control",
+      keyFinding:"Tight glycemic control lowered mortality and morbidity in this surgical cohort.",
+      practiceChange:"Sparked widespread tight glucose control \u2014 later reversed by NICE-SUGAR.",
+      citation:"N Engl J Med 2001;345:1359-1367."
+    },
+    {
+      id:"nice-sugar", type:"trial", name:"NICE-SUGAR",
+      fullTitle:"Intensive versus Conventional Glucose Control in Critically Ill Patients",
+      year:"2009", journal:"NEJM", evidence:"RCT",
+      category:"Metabolic & Glycemic",
+      oneLiner:"Intensive glucose control increased mortality and hypoglycemia versus a moderate target.",
+      population:"Medical-surgical ICU patients (n=6104)",
+      intervention:"Intensive glucose control (81-108 mg/dL)",
+      comparison:"Conventional target (<180 mg/dL)",
+      outcome:"90-day mortality \u2014 higher with intensive control",
+      keyFinding:"Tight control caused excess death and severe hypoglycemia.",
+      practiceChange:"Overturned tight glycemic control; set moderate targets (<180) as the standard.",
+      citation:"N Engl J Med 2009;360:1283-1297."
+    }
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  function el(tag, cls, txt){
+    var e=document.createElement(tag);
+    if(cls) e.className=cls;
+    if(txt!=null) e.textContent=txt;
+    return e;
+  }
+  function field(label, text, change){
+    var f=el("div","field"+(change?" change":""));
+    f.appendChild(el("h4",null,label));
+    f.appendChild(el("p",null,text));
+    return f;
+  }
+  function makeEmpty(title, sub){
+    var e=el("div","empty");
+    e.appendChild(el("b",null,title));
+    e.appendChild(el("p",null,sub));
+    return e;
+  }
+
+  var allOpen=false;
+
+  function makeCard(t, color){
+    var card=el("article","card");
+    var spine=el("div","spine"); spine.style.background=color; card.appendChild(spine);
+
+    var head=el("div","card-head");
+    head.setAttribute("role","button");
+    head.setAttribute("tabindex","0");
+    head.setAttribute("aria-expanded","false");
+
+    var main=el("div","card-main");
+    var titleline=el("div","card-titleline");
+    titleline.appendChild(el("span","trial-name", t.name));
+    if(t.year) titleline.appendChild(el("span","trial-year", t.year + (t.journal? " \u00b7 "+t.journal : "")));
+    if(t.evidence){
+      titleline.appendChild(el("span","badge"+(t.type==="guideline"?" guide":""), t.evidence));
+    }
+    main.appendChild(titleline);
+    main.appendChild(el("p","one-liner", t.oneLiner));
+
+    var chev=document.createElement("span"); chev.className="chev";
+    chev.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>';
+
+    head.appendChild(main);
+    head.appendChild(chev);
+    card.appendChild(head);
+
+    var detail=el("div","detail");
+    var inner=el("div","detail-inner");
+    if(t.fullTitle && t.fullTitle!==t.name)
+      inner.appendChild(el("p","full-title", t.fullTitle));
+
+    if(t.type!=="guideline" && (t.population||t.intervention||t.comparison||t.outcome)){
+      var pico=el("dl","pico");
+      [["Population",t.population],["Intervention",t.intervention],
+       ["Comparison",t.comparison],["Primary outcome",t.outcome]].forEach(function(pair){
+        if(!pair[1]) return;
+        var cell=document.createElement("div");
+        cell.appendChild(el("dt",null,pair[0]));
+        cell.appendChild(el("dd",null,pair[1]));
+        pico.appendChild(cell);
+      });
+      if(pico.children.length) inner.appendChild(pico);
+    } else if(t.outcome && t.outcome!=="\u2014"){
+      inner.appendChild(field("Scope", t.outcome));
+    }
+
+    if(t.keyFinding) inner.appendChild(field("Key finding", t.keyFinding));
+    if(t.practiceChange) inner.appendChild(field("What it changed", t.practiceChange, true));
+    if(t.citation) inner.appendChild(el("p","cite", t.citation));
+
+    detail.appendChild(inner);
+    card.appendChild(detail);
+
+    function toggle(){
+      var open=card.classList.toggle("open");
+      head.setAttribute("aria-expanded", open?"true":"false");
+    }
+    head.addEventListener("click",toggle);
+    head.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); }
+    });
+    if(allOpen){ card.classList.add("open"); head.setAttribute("aria-expanded","true"); }
+    return card;
+  }
+
+  function render(){
+    var lib=$("library");
+    lib.innerHTML="";
+    var filter=($("filterInput").value||"").trim().toLowerCase();
+
+    var shown=trials.filter(function(t){
+      if(!filter) return true;
+      return (t.name+" "+t.fullTitle+" "+t.oneLiner+" "+t.category).toLowerCase().indexOf(filter)>-1;
+    });
+
+    $("mTrials").textContent=trials.length;
+    $("mCats").textContent=new Set(trials.map(function(t){return t.category;})).size;
+
+    if(!shown.length){
+      lib.appendChild(makeEmpty("Nothing matches that filter.","Clear the filter to see all "+trials.length+" trials."));
+      return;
+    }
+
+    var groups={};
+    shown.forEach(function(t){ (groups[t.category]=groups[t.category]||[]).push(t); });
+    Object.keys(groups).sort().forEach(function(cat){
+      var color=catColor(cat);
+      var section=el("section","cat");
+      var head=el("div","cat-head");
+      var tab=el("span","cat-tab",cat); tab.style.background=color;
+      head.appendChild(tab);
+      head.appendChild(el("span","cat-count","("+groups[cat].length+")"));
+      head.appendChild(el("div","cat-rule"));
+      section.appendChild(head);
+      groups[cat].sort(function(a,b){ return (parseInt(b.year)||0)-(parseInt(a.year)||0); })
+        .forEach(function(t){ section.appendChild(makeCard(t,color)); });
+      lib.appendChild(section);
+    });
+  }
+
+  function setAll(open){
+    allOpen=open;
+    var cards=document.querySelectorAll(".card");
+    for(var i=0;i<cards.length;i++){
+      cards[i].classList.toggle("open",open);
+      var h=cards[i].querySelector(".card-head");
+      if(h) h.setAttribute("aria-expanded",open?"true":"false");
+    }
+  }
+  $("expandAll").addEventListener("click",function(){ setAll(true); });
+  $("collapseAll").addEventListener("click",function(){ setAll(false); });
+  $("filterInput").addEventListener("input", render);
+  render();
+})();
+</script>
+</body>
+</html>
